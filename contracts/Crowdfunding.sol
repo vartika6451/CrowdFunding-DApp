@@ -1,9 +1,9 @@
-//SPDX-License-Identifier-MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/utilis/ReentrancyGuards.sol";//prevents reentrancy attacks,before state updates,calls again
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";//prevents reentrancy attacks,before state updates,calls again
 
-contract Crowdfunding is ReentrancyGuards {
+contract Crowdfunding is ReentrancyGuard {
 
     struct Campaign {
         address creator;
@@ -39,21 +39,21 @@ contract Crowdfunding is ReentrancyGuards {
     }
 
     function fundCampaign(uint _id) external payable {
-        Campaign storage campaign = campaign[_id];
+        Campaign storage campaign = campaigns[_id];
 
-        require(block.timestamp , campaign.deadline, "Campaign ended");
+        require(block.timestamp <= campaign.deadline, "Campaign ended");
 
         campaign.pledged += msg.value;
         pledgedAmount[_id][msg.sender] += msg.value;
 
-        emit funded(_id, msg.sender, msg.value);
+        emit Funded(_id, msg.sender, msg.value);
     }
 
     function withdrawFunds(uint _id) external nonReentrant {
-        Campaign storage campaign = campaign[_id];
+        Campaign storage campaign = campaigns[_id];
 
-        require(msg.sender == campiagn.creator, "Not creator");
-        require(bloack.timestamp >= campaign.deadline, "Still running");
+        require(msg.sender == campaign.creator, "Not creator");
+        require(block.timestamp >= campaign.deadline, "Still running");
         require(campaign.pledged >= campaign.goal,"goal not met");
         require(!campaign.claimed,"Already claimed");
 
