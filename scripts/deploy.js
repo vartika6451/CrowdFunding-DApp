@@ -1,3 +1,5 @@
+const { ethers } = require("hardhat");
+
 async function main() {
   const Contract = await ethers.getContractFactory("Crowdfunding");
   const contract = await Contract.deploy();
